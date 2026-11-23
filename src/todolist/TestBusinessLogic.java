@@ -1,6 +1,7 @@
 package todolist;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TestBusinessLogic {
     public static void main(String[] args) {
@@ -17,5 +18,21 @@ public class TestBusinessLogic {
         for (Task t : manager.getAllTasks()) {
             System.out.println(t.getIdTask() + " | " + t.getTitle() + " | Status: " + t.getStatus());
         }
+    // 1. Uji method searchTaskByTitle buatan sendiri
+        System.out.println("\n--- HASIL PENCARIAN KATA KUNCI 'TUGAS' ---");
+        List<Task> hasilCari = manager.searchTaskByTitle("tugas");
+        for (Task t : hasilCari) {
+            System.out.println(t.getIdTask() + " - " + t.getTitle());
+        }
+
+        // 2. Uji method deleteTask buatan sendiri (ganti "T01" dengan salah satu ID yang ada di TestBusinessLogic)
+        System.out.println("\n--- UJI HAPUS TUGAS ---");
+        boolean terhapus = manager.deleteTask("T01");
+        System.out.println("Status penghapusan T01: " + terhapus);
+        System.out.println("Sisa jumlah tugas sekarang: " + manager.getAllTasks().size());    
+        
     }
+   
+    
+    
 }
