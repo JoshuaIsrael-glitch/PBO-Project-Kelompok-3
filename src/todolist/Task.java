@@ -37,7 +37,6 @@ public class Task {
         this.modifiedDateTime = LocalDateTime.now();
     }
 
-    // Getters & Setters
     public String getIdTask() { return idTask; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
