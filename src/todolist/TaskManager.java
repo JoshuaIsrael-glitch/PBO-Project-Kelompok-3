@@ -91,6 +91,9 @@ public class TaskManager {
     }
     
     public boolean deleteTask(String idTask){
+        if (idTask == null || idTask.trim(). isEmpty()){
+            return false;
+        }
         for (Task task : listTask) {
             if (task.getIdTask(). equalsIgnoreCase(idTask)){
                 listTask.remove(task);
@@ -101,6 +104,9 @@ public class TaskManager {
     }
     
    public List<Task> searchTaskByTitle(String keyword){
+       if (keyword == null || keyword.trim().isEmpty()){
+           return new ArrayList<>(listTask);
+       }
        List<Task> result = new ArrayList<>();
        for (Task task : listTask) {
            if (task.getTitle().toLowerCase().contains(keyword.toLowerCase())){
@@ -111,3 +117,4 @@ public class TaskManager {
        return result;
    }
 }
+
