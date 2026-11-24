@@ -21,7 +21,7 @@ public class TodoAppGUI extends JFrame {
     // Komponen UI
     private JTable taskTable;
     private DefaultTableModel tableModel;
-    private JTextField txtId, txtTitle, txtDesc, txtDueDate;
+    private JTextField txtId, txtTitle, txtDesc, txtDueDate, txtSearch;
     private JComboBox<String> cmbFilter;
     private JLabel lblNotification;
 
@@ -63,7 +63,7 @@ public class TodoAppGUI extends JFrame {
 
     private void initUI() {
         setTitle("Todo List Manager — Automated Timestamp Lifecycle");
-        setSize(1150, 640);
+        setSize(1220, 640);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         getContentPane().setBackground(BG_LIGHT);
@@ -76,7 +76,7 @@ public class TodoAppGUI extends JFrame {
 
         JPanel titleBox = new JPanel(new GridLayout(2, 1));
         titleBox.setOpaque(false);
-        JLabel lblAppTitle = new JLabel("TASKFLOW MANAGER");
+        JLabel lblAppTitle = new JLabel("ToDo-LIST MANAGER");
         lblAppTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
         lblAppTitle.setForeground(Color.WHITE);
         JLabel lblSubtitle = new JLabel("Automated Status Transition (Created vs Modified vs Due Date)");
@@ -107,7 +107,7 @@ public class TodoAppGUI extends JFrame {
         JPanel inputCard = new JPanel();
         inputCard.setLayout(new BoxLayout(inputCard, BoxLayout.Y_AXIS));
         inputCard.setBackground(CARD_WHITE);
-        inputCard.setPreferredSize(new Dimension(300, 0));
+        inputCard.setPreferredSize(new Dimension(290, 0));
         inputCard.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
                 new EmptyBorder(20, 20, 20, 20)
@@ -150,48 +150,74 @@ public class TodoAppGUI extends JFrame {
         leftWrapper.add(inputCard, BorderLayout.CENTER);
         add(leftWrapper, BorderLayout.WEST);
 
-        // ================= 3. TABEL & FILTER (TENGAH) =================
+        // ================= 3. TABEL, FILTER, SEARCH & ACTION (TENGAH) =================
         JPanel centerWrapper = new JPanel(new BorderLayout(0, 12));
         centerWrapper.setOpaque(false);
         centerWrapper.setBorder(new EmptyBorder(0, 0, 0, 20));
 
-        JPanel toolbar = new JPanel(new BorderLayout());
+        JPanel toolbar = new JPanel(new BorderLayout(10, 0));
         toolbar.setBackground(CARD_WHITE);
         toolbar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(226, 232, 240), 1),
                 new EmptyBorder(10, 15, 10, 15)
         ));
 
-        JPanel filterGroup = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        filterGroup.setOpaque(false);
-        JLabel lblFilter = new JLabel("Filter Status:");
-        lblFilter.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        cmbFilter = new JComboBox<>(new String[]{"ALL", "DRAFT", "PROGRESS", "CLOSE", "EXPIRED"});
-        cmbFilter.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        filterGroup.add(lblFilter);
-        filterGroup.add(cmbFilter);
+        // Panel Kiri Toolbar: Filter Status + Kotak Pencarian
+        JPanel filterAndSearchGroup = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        filterAndSearchGroup.setOpaque(false);
 
-        JPanel actionGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        JLabel lblFilter = new JLabel("Status:");
+        lblFilter.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        cmbFilter = new JComboBox<>(new String[]{"ALL", "DRAFT", "PROGRESS", "CLOSE", "EXPIRED"});
+        cmbFilter.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+        txtSearch = new JTextField(14);
+        txtSearch.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        txtSearch.setToolTipText("Ketik judul task lalu tekan Cari...");
+
+        JButton btnSearch = new JButton("Cari");
+        btnSearch.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnSearch.setBackground(PRIMARY_DARK);
+        btnSearch.setForeground(Color.WHITE);
+        btnSearch.setFocusPainted(false);
+        btnSearch.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        filterAndSearchGroup.add(lblFilter);
+        filterAndSearchGroup.add(cmbFilter);
+        filterAndSearchGroup.add(Box.createHorizontalStrut(6));
+        filterAndSearchGroup.add(txtSearch);
+        filterAndSearchGroup.add(btnSearch);
+
+        // Panel Kanan Toolbar: Tombol Edit, Complete, dan Delete
+        JPanel actionGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 0));
         actionGroup.setOpaque(false);
 
-        JButton btnEdit = new JButton("✎ Edit Task (Trigger PROGRESS)");
+        JButton btnEdit = new JButton("Edit");
         btnEdit.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnEdit.setBackground(new Color(245, 158, 11));
         btnEdit.setForeground(Color.WHITE);
         btnEdit.setFocusPainted(false);
         btnEdit.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        JButton btnMarkClose = new JButton("✓ Complete (Trigger CLOSE)");
+        JButton btnMarkClose = new JButton("Complete");
         btnMarkClose.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btnMarkClose.setBackground(new Color(22, 163, 74));
         btnMarkClose.setForeground(Color.WHITE);
         btnMarkClose.setFocusPainted(false);
         btnMarkClose.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
+        JButton btnDelete = new JButton("Delete");
+        btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnDelete.setBackground(new Color(220, 38, 38));
+        btnDelete.setForeground(Color.WHITE);
+        btnDelete.setFocusPainted(false);
+        btnDelete.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         actionGroup.add(btnEdit);
         actionGroup.add(btnMarkClose);
+        actionGroup.add(btnDelete);
 
-        toolbar.add(filterGroup, BorderLayout.WEST);
+        toolbar.add(filterAndSearchGroup, BorderLayout.WEST);
         toolbar.add(actionGroup, BorderLayout.EAST);
 
         // Kolom tabel menampilkan Created & Modified DateTime agar terlihat saat demo
@@ -233,8 +259,11 @@ public class TodoAppGUI extends JFrame {
         // Event Listeners
         btnAdd.addActionListener(e -> handleAddTask());
         cmbFilter.addActionListener(e -> handleFilter());
+        btnSearch.addActionListener(e -> handleSearchTask());
+        txtSearch.addActionListener(e -> handleSearchTask()); // Bisa tekan Enter langsung di kotak cari
         btnEdit.addActionListener(e -> handleEditTask());
         btnMarkClose.addActionListener(e -> handleMarkAsClose());
+        btnDelete.addActionListener(e -> handleDeleteTask());
     }
 
     private JPanel createStatCard(String title, JLabel countLabel, Color bg, Color numColor) {
@@ -347,6 +376,7 @@ public class TodoAppGUI extends JFrame {
             taskManager.addTask(newTask);
 
             cmbFilter.setSelectedItem("ALL");
+            txtSearch.setText("");
             refreshTable(taskManager.getAllTasks());
 
             taskCounter++;
@@ -397,6 +427,12 @@ public class TodoAppGUI extends JFrame {
         }
     }
 
+    private void handleSearchTask() {
+        String keyword = txtSearch.getText();
+        List<Task> hasilCari = taskManager.searchTaskByTitle(keyword);
+        refreshTable(hasilCari);
+    }
+
     private void handleMarkAsClose() {
         int selectedRow = taskTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -406,6 +442,29 @@ public class TodoAppGUI extends JFrame {
         String idTask = (String) tableModel.getValueAt(selectedRow, 0);
         taskManager.completeTask(idTask);
         handleFilter();
+    }
+
+    private void handleDeleteTask() {
+        int selectedRow = taskTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih baris tugas yang ingin dihapus terlebih dahulu!", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        String idTask = (String) tableModel.getValueAt(selectedRow, 0);
+        String title = (String) tableModel.getValueAt(selectedRow, 1);
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Yakin ingin menghapus tugas \"" + title + "\" (" + idTask + ")?",
+                "Konfirmasi Hapus",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            taskManager.deleteTask(idTask);
+            handleFilter();
+        }
     }
 
     private void refreshTable(List<Task> tasks) {
